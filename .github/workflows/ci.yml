@@ -1,0 +1,20 @@
+name: CI
+on: push
+jobs:
+  build:
+    name: Build Plugin
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          # TODO: - windows-latest
+          # TODO: - macOS-latest
+          - ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: |
+          sudo apt-get install -y libnotify-dev
+          mkdir ./build/
+          cd ./build/
+          cmake ..
+          cmake --build ./
