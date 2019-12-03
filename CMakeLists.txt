@@ -38,6 +38,7 @@ add_library(obs-notifications MODULE src/NotificationPlugin.cpp)
 if(LIBNOTIFY_FOUND)
 	target_link_libraries(obs-notifications notify)
 endif()
+
 # Out-of-source plugin builds are unsupported by OBS
 # This is a dirty hack...
 message(STATUS "Fetching OBS...")
@@ -50,12 +51,14 @@ FetchContent_Declare(
 		GIT_PROGRESS	YES
 )
 FetchContent_Populate(obs-studio)
-include_directories(
+target_include_directories(obs-notifications
+		PUBLIC
 		"${obs-studio_SOURCE_DIR}"
 		"${obs-studio_SOURCE_DIR}/UI/obs-frontend-api/"
 		"${obs-studio_SOURCE_DIR}/libobs/")
-
-target_include_directories(obs-notifications PUBLIC "${PROJECT_BINARY_DIR}/src/")
+target_include_directories(obs-notifications
+		PUBLIC
+		"${PROJECT_BINARY_DIR}/src/")
 
 # See: https://github.com/obsproject/obs-studio/blob/master/cmake/Modules/ObsHelpers.cmake#L550-L553
 #[[
