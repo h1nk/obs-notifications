@@ -7,11 +7,24 @@ set(CMAKE_CXX_EXTENSIONS false)
 
 include(CheckIncludeFile)
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBNOTIFY libnotify glib-2.0 gdk-pixbuf-2.0)
-if(LIBNOTIFY_FOUND)
-	include_directories(${LIBNOTIFY_INCLUDE_DIRS})
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/src/Config.hpp)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(LIBNOTIFY libnotify glib-2.0 gdk-pixbuf-2.0)
+	if(LIBNOTIFY_FOUND)
+		include_directories(${LIBNOTIFY_INCLUDE_DIRS})
+		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/src/Config.hpp)
+	endif()
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_BUILD_TYPE EQUAL "DEBUG")
+	FetchContent_Declare(
+			WinToast
+			GIT_REPOSITORY	https://github.com/mohabouje/WinToast.git
+			GIT_REMOTE_NAMfE github
+			GIT_TAG			v1.2.0
+			GIT_SHALLOW		YES
+			GIT_PROGRESS	YES
+	)
+	FetchContent_Populate(WinToast)
+	include_directories("${WinToast_SOURCE_DIR}/src/")
 endif()
 
 add_library(obs-notifications MODULE src/NotificationPlugin.cpp)
@@ -20,12 +33,12 @@ target_link_libraries(obs-notifications notify)
 # This is a dirty hack...
 include(FetchContent)
 FetchContent_Declare(
-	obs-studio
-	GIT_REPOSITORY  https://github.com/obsproject/obs-studio.git
-	GIT_REMOTE_NAME github
-	GIT_TAG         24.0.3
-	GIT_SHALLOW		YES
-	GIT_PROGRESS	YES
+		obs-studio
+		GIT_REPOSITORY  https://github.com/obsproject/obs-studio.git
+		GIT_REMOTE_NAME github
+		GIT_TAG         24.0.3
+		GIT_SHALLOW		YES
+		GIT_PROGRESS	YES
 )
 FetchContent_Populate(obs-studio)
 include_directories(
