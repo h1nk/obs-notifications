@@ -13,11 +13,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	pkg_check_modules(LIBNOTIFY libnotify glib-2.0 gdk-pixbuf-2.0)
 	if(LIBNOTIFY_FOUND)
 		include_directories(${LIBNOTIFY_INCLUDE_DIRS})
-		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/src/Config.hpp)
 	endif()
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-	message(STATUS "Fetching WinToast...")
 
 	FetchContent_Declare(
 			WinToast
@@ -27,14 +25,18 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Debug
 			GIT_SHALLOW			YES
 			GIT_PROGRESS		YES
 	)
+	message(STATUS "Fetching WinToast...")
 	FetchContent_Populate(WinToast)
 	include_directories("${WinToast_SOURCE_DIR}/src/")
 endif()
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/src/Config.hpp)
 
 add_library(obs-notifications MODULE src/NotificationPlugin.cpp)
 target_link_libraries(obs-notifications notify)
 # Out-of-source plugin builds are unsupported by OBS
 # This is a dirty hack...
+message(STATUS "Fetching OBS...")
 FetchContent_Declare(
 		obs-studio
 		GIT_REPOSITORY  https://github.com/obsproject/obs-studio.git
