@@ -15,14 +15,17 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 		include_directories(${LIBNOTIFY_INCLUDE_DIRS})
 		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/src/Config.hpp)
 	endif()
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_BUILD_TYPE EQUAL "DEBUG")
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+	message(STATUS "Fetching WinToast...")
+
 	FetchContent_Declare(
 			WinToast
-			GIT_REPOSITORY	https://github.com/mohabouje/WinToast.git
-			GIT_REMOTE_NAMfE github
-			GIT_TAG			v1.2.0
-			GIT_SHALLOW		YES
-			GIT_PROGRESS	YES
+			GIT_REPOSITORY		https://github.com/mohabouje/WinToast.git
+			GIT_REMOTE_NAME		github
+			GIT_TAG				v1.2.0
+			GIT_SHALLOW			YES
+			GIT_PROGRESS		YES
 	)
 	FetchContent_Populate(WinToast)
 	include_directories("${WinToast_SOURCE_DIR}/src/")
