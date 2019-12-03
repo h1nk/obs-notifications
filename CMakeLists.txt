@@ -16,7 +16,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	endif()
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-
 	FetchContent_Declare(
 			WinToast
 			GIT_REPOSITORY		https://github.com/mohabouje/WinToast.git
@@ -28,6 +27,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Debug
 	message(STATUS "Fetching WinToast...")
 	FetchContent_Populate(WinToast)
 	include_directories("${WinToast_SOURCE_DIR}/src/")
+
+	set(HAVE_WINTOAST YES)
 endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/src/Config.hpp)

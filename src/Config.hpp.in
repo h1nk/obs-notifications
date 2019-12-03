@@ -1,1 +1,2 @@
 #cmakedefine LIBNOTIFY_FOUND
+#cmakedefine HAVE_WINTOAST
