@@ -33,7 +33,9 @@ endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/src/Config.hpp)
 
 add_library(obs-notifications MODULE src/NotificationPlugin.cpp)
-target_link_libraries(obs-notifications notify)
+if(LIBNOTIFY_FOUND)
+	target_link_libraries(obs-notifications notify)
+endif()
 # Out-of-source plugin builds are unsupported by OBS
 # This is a dirty hack...
 message(STATUS "Fetching OBS...")
