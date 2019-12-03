@@ -51,8 +51,8 @@ FetchContent_Declare(
 		GIT_PROGRESS	YES
 )
 FetchContent_Populate(obs-studio)
-target_include_directories(obs-notifications
-		PUBLIC
+include_directories(
+		SYSTEM
 		"${obs-studio_SOURCE_DIR}"
 		"${obs-studio_SOURCE_DIR}/UI/obs-frontend-api/"
 		"${obs-studio_SOURCE_DIR}/libobs/")
