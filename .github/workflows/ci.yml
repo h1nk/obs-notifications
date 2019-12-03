@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os:
-          # TODO: - windows-latest
+          - windows-latest
           # TODO: - macOS-latest
           - ubuntu-latest
     steps:
