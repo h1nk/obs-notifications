@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(CMAKE_CXX_EXTENSIONS false)
 
 include(CheckIncludeFile)
+include(FetchContent)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	find_package(PkgConfig REQUIRED)
@@ -31,7 +32,6 @@ add_library(obs-notifications MODULE src/NotificationPlugin.cpp)
 target_link_libraries(obs-notifications notify)
 # Out-of-source plugin builds are unsupported by OBS
 # This is a dirty hack...
-include(FetchContent)
 FetchContent_Declare(
 		obs-studio
 		GIT_REPOSITORY  https://github.com/obsproject/obs-studio.git
