@@ -10,15 +10,13 @@
 #define PLUGIN_NAME         "Desktop Notifications"
 #define PLUGIN_DESCRIPTION  "Show desktop notifications for certain actions and events"
 #define PLUGIN_AUTHOR       "@h1nk"
-// See: https://github.com/obsproject/obs-studio/blob/master/UI/xdg-data/com.obsproject.Studio.desktop#L10
-#define PLUGIN_ICON         "/usr/share/icons/Papirus/48x48/apps/com.obsproject.Studio.svg"
 
 OBS_DECLARE_MODULE() // NOLINT(hicpp-signed-bitwise)
 
 void ShowNotification(const char* text)
 {
 	#ifdef LIBNOTIFY_FOUND
-	NotifyNotification *notification = notify_notification_new(text, nullptr, PLUGIN_ICON);
+	NotifyNotification *notification = notify_notification_new(text, nullptr, nullptr);
 	notify_notification_set_timeout(notification, 5'000);
 
 	GError **error = nullptr;
