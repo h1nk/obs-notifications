@@ -34,35 +34,16 @@ endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/src/Config.hpp)
 
+include_directories(
+		SYSTEM "${CMAKE_SOURCE_DIR}/libobs"
+		SYSTEM "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api"
+)
 add_library(obs-notifications MODULE src/NotificationPlugin.cpp)
 if(LIBNOTIFY_FOUND)
-	target_link_libraries(obs-notifications notify)
+	target_link_libraries(obs-notifications libobs notify)
 endif()
-
-# Out-of-source plugin builds are unsupported by OBS
-# This is a dirty hack...
-message(STATUS "Fetching OBS...")
-FetchContent_Declare(
-		obs-studio
-		GIT_REPOSITORY  https://github.com/obsproject/obs-studio.git
-		GIT_REMOTE_NAME github
-		GIT_TAG         24.0.3
-		GIT_SHALLOW		YES
-		GIT_PROGRESS	YES
-)
-FetchContent_Populate(obs-studio)
 target_include_directories(obs-notifications
-		PUBLIC
-		"${obs-studio_SOURCE_DIR}"
-		"${obs-studio_SOURCE_DIR}/UI/obs-frontend-api/"
-		"${obs-studio_SOURCE_DIR}/libobs/")
-target_include_directories(obs-notifications
-		PUBLIC
-		"${PROJECT_BINARY_DIR}/src/")
+		PRIVATE "${PROJECT_BINARY_DIR}/src/")
 
 # See: https://github.com/obsproject/obs-studio/blob/master/cmake/Modules/ObsHelpers.cmake#L550-L553
-#[[
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${obs-studio_SOURCE_DIR}/cmake/Modules/")
-include(ObsHelpers)
-install_obs_plugin_with_data(obs-notifications data)
-]]
+install_obs_plugin(obs-notifications)
