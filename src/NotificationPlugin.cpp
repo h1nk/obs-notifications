@@ -47,6 +47,22 @@ void OBSFrontendEventCallback(enum obs_frontend_event event, void* private_data)
 	{
 		ShowNotification("Recording Stopped");
 	}
+	else if (event == OBS_FRONTEND_EVENT_STREAMING_STARTED)
+	{
+		ShowNotification("Streaming Started");
+	}
+	else if (event == OBS_FRONTEND_EVENT_STREAMING_STOPPED)
+	{
+		ShowNotification("Streaming Stopped");
+	}
+	else if (event == OBS_FRONTEND_EVENT_REPLAY_BUFFER_STARTED)
+	{
+		ShowNotification("Replay Buffer Started");
+	}
+	else if (event == OBS_FRONTEND_EVENT_REPLAY_BUFFER_STOPPED)
+	{
+		ShowNotification("Replay Buffer Stopped");
+	}
 
 	UNUSED_PARAMETER(private_data);
 }
