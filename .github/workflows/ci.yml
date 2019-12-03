@@ -12,8 +12,10 @@ jobs:
           - ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Install libnotify development headers
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get install -y libnotify-dev
       - run: |
-          sudo apt-get install -y libnotify-dev
           mkdir ./build/
           cd ./build/
           cmake ..
