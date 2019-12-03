@@ -7,6 +7,7 @@ set(CMAKE_CXX_EXTENSIONS false)
 
 include(CheckIncludeFile)
 include(FetchContent)
+set(FETCHCONTENT_QUIET NO)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	find_package(PkgConfig REQUIRED)
