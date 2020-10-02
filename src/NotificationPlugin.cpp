@@ -4,7 +4,7 @@
 
 #include <sys/mman.h>   // mprotect(2), PROT_READ, PROT_WRITE, PROT_EXEC
 #include <dlfcn.h>
-#include <link.h>
+#include <link.h>       // dl_iterate_phdr(3), struct dl_phdr_info
 #include <elf.h>        // Elf64_Addr
 #include <unistd.h>     // getpagesize(2)
 
@@ -28,10 +28,11 @@ OBS_DECLARE_MODULE() // NOLINT(hicpp-signed-bitwise)
 
 static Elf64_Addr moduleBase = 0;
 
-int mempatch(void *dst, void *src, size_t size) {
+int mempatch(void* dst, void* src, size_t size) {
     std::size_t pageMask = ~(getpagesize() - 1);
     void* aligned = (void*) (((size_t) dst) & pageMask);
     std::size_t aligned_size = reinterpret_cast<std::size_t>(dst) - reinterpret_cast<std::size_t>(aligned) + size;
+
     if (mprotect(aligned, aligned_size, PROT_READ | PROT_WRITE) != 0) {
         perror("mprotect");
         return 1;
@@ -44,44 +45,39 @@ int mempatch(void *dst, void *src, size_t size) {
     return 0;
 }
 
-void show_notification_str(const std::string& text)
-{
+void show_notification_str(const std::string& text) {
 	#ifdef LIBNOTIFY_FOUND
-	NotifyNotification *notification = notify_notification_new(text.c_str(), nullptr, nullptr);
-	notify_notification_set_timeout(notification, 5'000);
-
-	GError** error = nullptr;
-	if (!notify_notification_show(notification, error))
-	{
-		// TODO
-	}
+	  NotifyNotification* notification = notify_notification_new(text.c_str(), nullptr, nullptr);
+	  notify_notification_set_timeout(notification, 5'000);
+  
+	  GError** error = nullptr;
+	  if (!notify_notification_show(notification, error)) {
+	  	// TODO
+	  }
 	#endif
 }
 
-extern "C"
-{
-void show_replay_saved_notif() {
-    show_notification_str("Saving Replay Buffer...");
-}
-}
+extern "C" {
+  void show_replay_saved_notif() {
+      show_notification_str("Saving Replay Buffer...");
+  }
 
-extern "C"
-{
   void _show_replay_saved_notif();
 }
+
 asm(R"(
-_show_replay_saved_notif:
-push %rbx;
-push %rdx;
-call show_replay_saved_notif;
-pop %rdx;
-pop %rbx;
-mov %rdx,0x88(%rbx);
-pop %rbx;
-ret;
+	_show_replay_saved_notif:
+	push %rbx;
+	push %rdx;
+	call show_replay_saved_notif;
+	pop %rdx;
+	pop %rbx;
+	mov %rdx,0x88(%rbx);
+	pop %rbx;
+	ret;
 )");
 
-[[maybe_unused]] void OBSFrontendEventCallback(enum obs_frontend_event event, void* private_data) {
+void OBSFrontendEventCallback(enum obs_frontend_event event, void* private_data) {
 	if (event == OBS_FRONTEND_EVENT_RECORDING_STARTED)
         show_notification_str("Recording Started");
 	else if (event == OBS_FRONTEND_EVENT_RECORDING_PAUSED)
@@ -102,11 +98,8 @@ ret;
 	UNUSED_PARAMETER(private_data);
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
-
 static int
-callback([[maybe_unused]] struct dl_phdr_info *info, [[maybe_unused]] size_t size, [[maybe_unused]] void* data) {
+callback([[maybe_unused]] struct dl_phdr_info* info, [[maybe_unused]] size_t size, [[maybe_unused]] void* data) {
     if (std::string(info->dlpi_name).find("obs-ffmpeg.so") != std::string::npos)
         moduleBase = info->dlpi_addr;
 
@@ -133,13 +126,15 @@ MODULE_EXPORT bool obs_module_load() {
 
     // TODO: replay_buffer_mux_thread: F3 0F 1E FA 41 54 55 53 48 89 FB 48 83 EC 20 ("obs-ffmpeg.so" + 0xE120)
 
+	obs_frontend_add_event_callback(OBSFrontendEventCallback, nullptr);
+
 	return true;
 }
 
 void obs_module_unload() {
 	#ifdef LIBNOTIFY_FOUND
-	// Uninitialize libnotify before exiting
-	notify_uninit();
+	  // Uninitialize libnotify before exiting
+	  notify_uninit();
 	#endif
 }
 
@@ -152,5 +147,3 @@ MODULE_EXPORT const char* obs_module_description() {
 }
 
 OBS_MODULE_AUTHOR(PLUGIN_AUTHOR)
-
-#pragma clang diagnostic pop
