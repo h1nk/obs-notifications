@@ -1,17 +1,17 @@
-#include <string>       // std::string
-#include <cstddef>      // std::size_t
-#include <cstring>      // std::memcpy
+#include <string>               // std::string
+#include <cstddef>              // std::size_t
+#include <cstring>              // std::memcpy
 
-#include <sys/mman.h>   // mprotect(2), PROT_READ, PROT_WRITE, PROT_EXEC
+#include <sys/mman.h>           // mprotect(2), PROT_READ, PROT_WRITE, PROT_EXEC
 #include <dlfcn.h>
-#include <link.h>       // dl_iterate_phdr(3), struct dl_phdr_info
-#include <elf.h>        // Elf64_Addr
-#include <unistd.h>     // getpagesize(2)
+#include <link.h>               // dl_iterate_phdr(3), struct dl_phdr_info
+#include <elf.h>                // Elf64_Addr
+#include <unistd.h>             // getpagesize(2)
 
-#include <libobs/obs-module.h>
+#include <obs-module.h>
 #include <obs-frontend-api.h>
 
-#include "Config.hpp"
+#include "config.hpp"
 
 #ifdef LIBNOTIFY_FOUND
   #include <libnotify/notify.h>
@@ -79,21 +79,21 @@ asm(R"(
 
 void OBSFrontendEventCallback(enum obs_frontend_event event, void* private_data) {
 	if (event == OBS_FRONTEND_EVENT_RECORDING_STARTED)
-        show_notification_str("Recording Started");
+                show_notification_str("Recording Started");
 	else if (event == OBS_FRONTEND_EVENT_RECORDING_PAUSED)
-        show_notification_str("Recording Paused");
+                show_notification_str("Recording Paused");
 	else if (event == OBS_FRONTEND_EVENT_RECORDING_UNPAUSED)
-        show_notification_str("Recording Unpaused");
+                show_notification_str("Recording Unpaused");
 	else if (event == OBS_FRONTEND_EVENT_RECORDING_STOPPED)
-        show_notification_str("Recording Stopped");
+                show_notification_str("Recording Stopped");
 	else if (event == OBS_FRONTEND_EVENT_STREAMING_STARTED)
-        show_notification_str("Streaming Started");
+                show_notification_str("Streaming Started");
 	else if (event == OBS_FRONTEND_EVENT_STREAMING_STOPPED)
-        show_notification_str("Streaming Stopped");
+                show_notification_str("Streaming Stopped");
 	else if (event == OBS_FRONTEND_EVENT_REPLAY_BUFFER_STARTED)
-        show_notification_str("Replay Buffer Started");
+                show_notification_str("Replay Buffer Started");
 	else if (event == OBS_FRONTEND_EVENT_REPLAY_BUFFER_STOPPED)
-        show_notification_str("Replay Buffer Stopped");
+                show_notification_str("Replay Buffer Stopped");
 
 	UNUSED_PARAMETER(private_data);
 }
