@@ -1,0 +1,1 @@
+Made this plugin for OBS because I absolutely lost my cool when the save replay buffer hotkey didn't work on several occasions. It's Linux (`obsproject/obs-studio/ubuntu focal/main amd64` Launchpad package) only due to non-portable x64 hacks, sorry Windows users!
