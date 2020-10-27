@@ -58,11 +58,12 @@ void show_notification_str(const std::string& text) {
 }
 
 extern "C" {
-  void show_replay_saved_notif() {
-      show_notification_str("Saving Replay Buffer...");
-  }
+        void show_replay_saved_notif() {
+                show_notification_str("Saving Replay Buffer...");
+        }
 
-  void _show_replay_saved_notif();
+        void _show_replay_saved_notif();
+        void _show_replay_file_saved_notif(char* name);
 }
 
 asm(R"(
@@ -75,6 +76,14 @@ asm(R"(
 	mov %rdx,0x88(%rbx);
 	pop %rbx;
 	ret;
+)");
+
+asm(R"(
+        _show_replay_file_saved_notif:
+
+        call show_replay_saved_notif;
+
+        ret;
 )");
 
 void OBSFrontendEventCallback(enum obs_frontend_event event, void* private_data) {
@@ -114,17 +123,27 @@ MODULE_EXPORT bool obs_module_load() {
 	}
 	#endif
 
-    dl_iterate_phdr(callback, nullptr);
+        dl_iterate_phdr(callback, nullptr);
 
-    const auto ptr1 = &_show_replay_saved_notif;
+        const auto ptr1 = &_show_replay_saved_notif;
 
-    // replay_buffer_hotkey: 53 48 89 FB 0F B6 47 39 84 C0 75 04 5B C3 ("obs-ffmpeg.so" + 0xD770)
-    mempatch((void*)(moduleBase + 0xD7AE), (void*)"\x48\xB8" /* movabs %rax, */, 2);
-    mempatch((void*)(moduleBase + 0xD7AE + 2), (void*)&ptr1 /* 0x7fffbcc40cae etc. */, 8);
-    mempatch((void*)(moduleBase + 0xD7AE + 2 + 8), (void*)"\xFF\xE0" /* jmp %rax */, 2);
-    mempatch((void*)(moduleBase + 0xD7AE + 2 + 8 + 2), (void*)"\xC3" /* ret */, 1);
+	const auto offset1 = 0xd7be;
 
-    // TODO: replay_buffer_mux_thread: F3 0F 1E FA 41 54 55 53 48 89 FB 48 83 EC 20 ("obs-ffmpeg.so" + 0xE120)
+        // replay_buffer_hotkey: 53 48 89 FB 0F B6 47 39 84 C0 75 04 5B C3 ("obs-ffmpeg.so" + 0xd78d)
+        mempatch((void*)(moduleBase + offset1), (void*)"\x48\xB8" /* movabs %rax, */, 2);
+        mempatch((void*)(moduleBase + offset1 + 2), (void*)&ptr1 /* 0x7fffbcc40cae etc. */, 8);
+        mempatch((void*)(moduleBase + offset1 + 2 + 8), (void*)"\xFF\xE0" /* jmp %rax */, 2);
+        mempatch((void*)(moduleBase + offset1 + 2 + 8 + 2), (void*)"\xC3" /* ret */, 1);
+
+//	const auto ptr2 = &_show_replay_file_saved_notif;
+
+        // TODO: replay_buffer_mux_thread: F3 0F 1E FA 41 54 55 53 48 89 FB 48 83 EC 20 ("obs-ffmpeg.so" + 0xE120)
+
+//	mempatch((void*)(moduleBase + 0xE1EA), (void*)"\x48\xB8" /* movabs %rax, */, 2);
+//        mempatch((void*)(moduleBase + 0xE1EA + 2), (void*)&ptr2 /* 0x7fffbcc40cae etc. */, 8);
+//        mempatch((void*)(moduleBase + 0xE1EA + 2 + 8), (void*)"\xFF\xE0" /* jmp %rax */, 2);
+//        mempatch((void*)(moduleBase + 0xE1EA + 2 + 8 + 2), (void*)"\xC3" /* ret */, 1);
+//        mempatch((void*)(moduleBase + 0xE1EA + 2 + 8 + 2 + 1), (void*)"\x00\x00\x00\x00\x00\x00\x00\x00" /* ret */, 8);
 
 	obs_frontend_add_event_callback(OBSFrontendEventCallback, nullptr);
 
